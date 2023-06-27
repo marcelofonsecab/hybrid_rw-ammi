@@ -2,6 +2,14 @@
 SxM = readRDS("SteptoeMorexData.RData")
 
 # Load the Methods.R script
+## Required Packages ##
+# install.packages("dplyr")
+# install.packages("pbapply")
+# install.packages("lme4")
+# install.packages("robustlmm")
+# install.packages("MASS")
+# install.packages("reshape2")
+# install.packages("rsvddpd")
 source("Methods.R")
 
 # Calculate the error variance of SxM
@@ -11,6 +19,7 @@ varerror_SxM = Error_Var(SxM)
 Weights_SxM = R.Weights(SxM, varerror_SxM)
 
 # Perform all singular value decompositions (SVDs) using SxM (as not contaminated), SxM (as contaminated), and the calculated weights
+# rSVD = T; indicates that we used the robust weighted SVD iteratively
 allsvds = All_SVDS(SxM, SxM, Weights_SxM, rSVD = TRUE)
 
 # Perform a normality test on the residuals
@@ -75,7 +84,7 @@ BiplotCreation(allsvds$AMMI$SVD,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
-## W-AMMI
+## W-AMMI {1,5,6}
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.Env$SVD,
                env.names = .envnames,
                lims = TRUE,
@@ -89,7 +98,7 @@ BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.RlmdotEnv$SVD,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
-## R-AMMI
+## R-AMMI {1,5,6}
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.Env$SVD,
                env.names = .envnames,
                lims = TRUE,
@@ -103,7 +112,7 @@ BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.RlmdotEnv$SVD,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
-## RW-AMMI
+## RW-AMMI {1,5,6}
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.Env$SVD,
                env.names = .envnames,
                lims = TRUE,
@@ -118,7 +127,7 @@ BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.RlmdotEnv$SVD,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
 # Biplots from Supplementary material
-## W-AMMI
+## W-AMMI {2,3,4,7,8,9}
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.Gen$SVD,
                env.names = .envnames,
                lims = TRUE,
@@ -144,7 +153,7 @@ BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.GenplusEnv$SVD,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
-## R-AMMI
+## R-AMMI {2,3,4,7,8,9}
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.Gen$SVD,
                env.names = .envnames,
                lims = TRUE,
@@ -170,7 +179,7 @@ BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.GenplusEnv$SVD,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
-## RW-AMMI
+## RW-AMMI {2,3,4,7,8,9}
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.Gen$SVD,
                env.names = .envnames,
                lims = TRUE,

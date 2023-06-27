@@ -22,6 +22,14 @@ alldata = readRDS("Simulated Data\\SimulatedData_percent2_shift4.RData")
 
 
 # Load the Methods.R script
+## Required Packages ##
+# install.packages("dplyr")
+# install.packages("pbapply")
+# install.packages("lme4")
+# install.packages("robustlmm")
+# install.packages("MASS")
+# install.packages("reshape2")
+# install.packages("rsvddpd")
 source("Methods.R")
 
 # Attach the first dataset in alldata
