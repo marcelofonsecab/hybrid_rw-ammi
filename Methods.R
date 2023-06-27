@@ -835,3 +835,43 @@ best_envgen = function(x, quant = 1,
   return(data_aux)
   
 }
+
+# The appendList function append values to a list, it helps to append metrics of all the simulations
+appendList <- function(x, val) {
+  stopifnot(is.list(x), is.list(val)) # Ensure x and val are both lists
+  xnames <- names(x) # Get the names of x
+  for (v in names(val)) {
+    x[[v]] <- if (v %in% xnames && is.list(x[[v]]) && is.list(val[[v]])) 
+      # If the name v exists in x, and both x[[v]] and val[[v]] are lists, recursively call appendList
+      appendList(x[[v]], val[[v]])
+    else
+      # Otherwise, concatenate the values
+      c(x[[v]], val[[v]])
+  }
+  x
+}
+
+# Function to apply a metric to a list of data
+# Optionally perform hypothesis testing
+Metricsapply = function(list, metric, hypothesis.testing = FALSE, h0 = 100, side = "greater") {
+  len = length(list)  # Get the length of the list
+  tmp = tmp_aux = test_aux = NULL
+  for (i in 1:len) {
+    tmp_aux = mean(list[[i]][[metric]])  # Calculate the metric for each element in the list
+    tmp = c(tmp, tmp_aux)  # Append the calculated metric to a temporary vector
+    
+    if (hypothesis.testing) {
+      test_aux = c(test_aux, t.test(x = list[[i]][[metric]],
+                                    alternative = side,
+                                    mu = h0)$p.value)  # Perform hypothesis testing and store the p-value
+    }
+  }
+  
+  if (hypothesis.testing) {
+    Values = list('Metric' = tmp, 'pvalues' = test_aux)  # Create a list with calculated metrics and p-values
+  } else {
+    Values = list('Metric' = tmp)  # Create a list with calculated metrics only
+  }
+  
+  return(Values)  # Return the list of calculated metrics and p-values (if applicable)
+}
