@@ -746,3 +746,92 @@ BiplotCreation <- function(SVD, env.names = NULL, gen.names = NULL,
        labels = env.names, col = "darkgreen", cex = 1.4) # Add environment names
   
 }
+
+# The best_envgen function creates a matrix which indicates the best, if quant = 1, genotype for every environment
+# if quant = 2, it'll pick up the second best genotype
+best_envgen = function(x, quant = 1,
+                       gen_names0 = NULL, env_names = NULL,
+                       colors = FALSE) {
+  
+  # Best Environment-Genotype function
+  
+  # Arguments:
+  # - x: Object containing SVD results.
+  # - quant: Number of top genotypes to select for each environment (default is 1).
+  # - gen_names0: Original genotype names (default is NULL).
+  # - env_names: Environment names (default is NULL).
+  # - colors: Flag indicating whether to use colors for highlighting (default is FALSE).
+  
+  Ncomp = 2
+  
+  if (is.matrix(x$SVD$d) == TRUE) {
+    diag_D = x$SVD$d
+  } else {
+    diag_D = diag(x$SVD$d)
+  }
+  scores = x$SVD$u[, 1:Ncomp] %*% (diag_D[1:Ncomp, 1:Ncomp] ^ 0.5)
+  loadings = x$SVD$v[, 1:Ncomp] %*% (diag_D[1:Ncomp, 1:Ncomp] ^ 0.5)
+  
+  gen_names = paste0(1:nrow(scores))
+  
+  if (is.null(env_names)) {
+    env_names = paste0("ENV", 1:nrow(loadings))
+  }
+  
+  rownames(scores) = gen_names
+  rownames(loadings) = env_names
+  
+  df_aux = matrix(rep("0", length(env_names)),
+                  nrow = length(env_names), ncol = 1)
+  rownames(df_aux) = env_names
+  colnames(df_aux) = paste0(quant)
+  
+  data_aux = df_aux
+  
+  for (env in env_names) {
+    
+    venvironment = env
+    quant
+    line_projection = c(-loadings[venvironment, 2],
+                        loadings[venvironment, 1],
+                        loadings[venvironment, 1],
+                        loadings[venvironment, 2])
+    
+    line_projection = matrix(line_projection, nrow = 2)
+    gen_pos = NULL
+    for (i in 1:length(gen_names)) {
+      vec_coord = matrix(c(0, loadings[venvironment, 1] * scores[i, 1] +
+                             loadings[venvironment, 2] * scores[i, 2]), ncol = 1)
+      solve_matrix = solve(line_projection, vec_coord)
+      gen_pos = rbind(gen_pos, t(solve_matrix))  
+    }
+    
+    values = NULL
+    
+    for (i in 1:length(gen_names)) {
+      values = c(values, sum(loadings[venvironment, ] * gen_pos[i, ]) / 
+                   sqrt(sum(loadings[venvironment, ]^2)))
+    }
+    
+    aux = data.frame(values, gen_names)
+    best_quant = aux[order(aux[, "values"], decreasing = TRUE), 2][quant]
+    data_aux[env, ] = best_quant
+    
+  }
+  
+  if (is.null(gen_names0)) {
+    gen_names0 = paste0(1:nrow(scores))
+  }
+  gen_names0 = gen_names0[as.numeric(data_aux)]
+  
+  if (colors) {
+    data_cols = changetocolors(data_aux)
+    
+    data_aux = paste0(gen_names0, cell_spec("", background = t(data_cols)))
+  } else {
+    data_aux[, 1] = gen_names0
+  }
+  
+  return(data_aux)
+  
+}
