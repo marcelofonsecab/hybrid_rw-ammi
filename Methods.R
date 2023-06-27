@@ -9,6 +9,135 @@ library(rsvddpd) # Robust SVD
 
 ## Functions ##
 
+# The sim.amb function simulates a new dataset based on the main effects and multiplicative effects.
+sim.amb <- function(seed = NULL, Ngen = 100, Nenv = 8, Ncomp = 2,
+                    effectGlobal = c(mean = 15, sd = sqrt(3)),
+                    effectGen = c(mean = 5, sd = 1), 
+                    effectEnv = c(mean = 8, sd = sqrt(2)), 
+                    k = rep(1, Nenv)) {
+  
+  # Simulate Genotype-Environment data
+  
+  # Arguments:
+  # - seed: Seed value for simulation (default is NULL).
+  # - Ngen: Number of genotypes.
+  # - Nenv: Number of environments.
+  # - Ncomp: Number of principal components to use.
+  # - effectGlobal: Mean and standard deviation of the global mean (default is c(mean = 15, sd = sqrt(3))).
+  # - effectGen: Mean and standard deviation of genotype effect (default is c(mean = 5, sd = 1)).
+  # - effectEnv: Mean and standard deviation of environment effect (default is c(mean = 8, sd = sqrt(2))).
+  # - k: Vector of weights for each principal component (default is rep(1, Nenv)).
+  
+  seed.aux <- ifelse(is.null(seed), sample(1:2^16, 1), seed) # If no seed provided, generate a random seed
+  set.seed(seed.aux)
+  
+  globalMean <- rnorm(1, effectGlobal[1], effectGlobal[2]) # Generate global mean
+  alpha <- rnorm(Ngen, mean = effectGen[1], effectGen[2]) # Generate genotype effects
+  beta <- rnorm(Nenv, mean = effectEnv[1], effectEnv[2]) # Generate environment effects
+  
+  rand.mat <- matrix(runif(Ngen * Nenv, min = -0.5, max = 0.5), ncol = Nenv)
+  rand.svd <- svd(rand.mat) # SVD of random matrix
+  rand.u <- rand.svd$u # Matrix U
+  rand.v <- rand.svd$v # Matrix V
+  rand.d <- diag(rand.svd$d) # Diagonal vector of matrix D
+  
+  simulated.amb <- matrix(rep(1, Ngen)) %*% t(matrix(rep(1, Nenv))) * globalMean +
+    alpha %*% t(matrix(rep(1, Nenv))) +
+    matrix(rep(1, Ngen)) %*% t(beta) # Matrix with only the effects
+  # Simulate the environment using N principal components from the random matrix via U(-0.5, 0.5)
+  for (j in 1:Ncomp) {
+    simulated.amb <- simulated.amb + 
+      ((rand.u[, j] * rand.d[j, j]) %*% t(rand.v[, j])) * (k[j]) # Add random effects
+  }
+  
+  # Organize the matrix and transform it into a dataframe
+  aux <- matrix(rep(0, Ngen * Nenv * 4), ncol = 4)
+  aux <- as.data.frame(aux)
+  colnames(aux) <- c("gen", "env", "rep", "yield")
+  aux$gen <- rep(paste0("G", sprintf('%0.3d', 1:Ngen)), Nenv)
+  aux[order(aux$gen), ]$env <- rep(paste("E", 1:Nenv, sep = ""), Ngen)
+  aux$yield <- c(simulated.amb)
+  
+  # Create a dataframe with all replications and a dataframe of means based on replications
+  finaldf <- aux
+  finaldf$gen <- as.factor(finaldf$gen)
+  finaldf$env <- as.factor(finaldf$env)
+  finaldf$rep <- 1
+  finaldf$rep <- as.factor(finaldf$rep)
+  data <- as.data.frame(finaldf)
+  
+  return(data)
+}
+
+# The Create.Replications function generates replication of genotype-environment data.
+Create.Replications = function(data, reps = 2, sig = 1) {
+  
+  
+  # Arguments:
+  # - data: Original dataset containing genotype-environment data.
+  # - reps: Number of replications to create (default is 2).
+  # - sig: Standard deviation of the residuals (default is 1).
+  
+  Nenv = length(levels(data$env))
+  Ngen = length(levels(data$gen))
+  N = Nenv * Ngen
+  data.tmp = data.aux = NULL
+  
+  for (i in 1:reps) {
+    resids = rnorm(N, mean = 0, sd = sqrt(sig)) # Generate random residuals
+    data.aux = data
+    data.aux$yield = data.aux$yield + resids # Add residuals to the yield values
+    data.aux$rep = i # Assign replication number
+    data.tmp = rbind(data.tmp, data.aux) # Append replicated data to the temporary dataframe
+  }
+  
+  return(data.tmp)
+}
+
+# The Data_Contamination function contaminates the first replication of the simulated data.
+Data_Contamination = function(data, percentage = 5, seed = 1,
+                              type = "shift", k = 7, c = 10) {
+
+  # Arguments:
+  # - data: Original dataset containing genotype-environment data.
+  # - percentage: Percentage of data to contaminate (default is 5%).
+  # - seed: Seed value for reproducibility (default is 1).
+  # - type: Type of contamination ("shift", "pointmass", or "varinflated", default is "shift").
+  # - k: Shift factor for "shift" type contamination (default is 7).
+  # - c: Scaling factor for "pointmass" and "varinflated" type contamination (default is 10).
+  
+  set.seed(seed)
+  types_aux = c("shift", "pointmass", "varinflated")
+  match.arg(type, types_aux) # Match the type argument to one of the allowed types
+  percentage_aux = ifelse(percentage > 1, percentage / 100, percentage) # Convert percentage to decimal if necessary
+  df_aux = data[data$rep == 1, ] # Subset the data for the first replication
+  matrix_aux = tapply(data$yield,
+                      data[, c("gen", "env")],
+                      mean) # Calculate means for each genotype-environment combination
+  Means_Deviations = cbind(mean = apply(matrix_aux, 2, mean),
+                           deviation = apply(matrix_aux, 2, sd)) # Calculate means and deviations
+  
+  Nenv = levels(df_aux$env) %>% length() # Number of environments
+  Ngen = levels(df_aux$gen) %>% length() # Number of genotypes
+  Nrow = nrow(df_aux) # Number of rows in the subsetted data
+  
+  sample_aux = sample(1:Nrow, Nrow * percentage_aux, replace = FALSE) # Randomly sample rows to contaminate
+  df_tmp = df_aux[sample_aux,] # Subset the contaminated rows
+  
+  for (i in 1:Nenv) {
+    sample_tmp = which(df_tmp$env == rownames(Means_Deviations)[i]) # Subset rows for each environment
+    df_tmp[sample_tmp, "yield"] = rnorm(length(sample_tmp),
+                                        mean = Means_Deviations[i, 1] + ifelse(type == "shift", k, 0) * Means_Deviations[i, 2],
+                                        sd = Means_Deviations[i, 2] / ifelse(type == "pointmass" | type == "varinflated", sqrt(c), 1)) # Contaminate yield values based on the selected type
+  }
+  
+  df_aux[sample_aux, ] = df_tmp # Replace the contaminated rows in the original data subset
+  df_aux = rbind(df_aux, data[data$rep != 1,]) # Combine the contaminated subset with the remaining data
+  data.full = list(data.not_contaminated = data, data.contaminated = df_aux) # Create a list containing both the original and contaminated data
+  
+  return(data.full)
+}
+
 # The transform_usable_data function takes a dataframe or matrix as input and applies a specified function to transform the data.
 transform_usable_data = function(dataframe, func, type = c("dataframe", "matrix")){
   type_aux = c("dataframe", "matrix")
@@ -560,20 +689,20 @@ GEI.Metrics <- function(allSVDs, Ncomp = 2){
 }
 
 # The BiplotCreation function creates a biplot from the scores and loadings obtained from a Singular Value Decomposition (SVD) analysis.
-BiplotCreation <- function(x, env.names = NULL, gen.names = NULL,
+BiplotCreation <- function(SVD, env.names = NULL, gen.names = NULL,
                            nms = c("IPC1", "IPC2"), lims = FALSE,
                            lims.U, lims.V){
   
   Ncomp <- 2
   
   # Extract scores and loadings from the SVD object
-  if(is.matrix(x$d)){ # Check if diagonal matrix
-    diag <- x$d
+  if(is.matrix(SVD$d)){ # Check if diagonal matrix
+    diag <- SVD$d
   } else{
-    diag <- diag(x$d) # Extract diagonal elements
+    diag <- diag(SVD$d) # Extract diagonal elements
   }
-  scores <- x$u[, 1:Ncomp] %*% (diag[1:Ncomp, 1:Ncomp] ^ 0.5) # Calculate scores
-  loadings <- x$v[, 1:Ncomp] %*% (diag[1:Ncomp, 1:Ncomp] ^ 0.5) # Calculate loadings
+  scores <- SVD$u[, 1:Ncomp] %*% (diag[1:Ncomp, 1:Ncomp] ^ 0.5) # Calculate scores
+  loadings <- SVD$v[, 1:Ncomp] %*% (diag[1:Ncomp, 1:Ncomp] ^ 0.5) # Calculate loadings
   
   # Assign default names to environments and genotypes if not provided
   if(is.null(env.names)){
@@ -617,4 +746,3 @@ BiplotCreation <- function(x, env.names = NULL, gen.names = NULL,
        labels = env.names, col = "darkgreen", cex = 1.4) # Add environment names
   
 }
-
