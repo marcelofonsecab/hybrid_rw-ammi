@@ -1,3 +1,14 @@
+# Load the Methods.R script
+## Required Packages ##
+# install.packages("dplyr")
+# install.packages("pbapply")
+# install.packages("lme4")
+# install.packages("robustlmm")
+# install.packages("MASS")
+# install.packages("reshape2")
+# install.packages("rsvddpd")
+source("Methods.R")
+
 # Example of simulating one dataset (seed 1, 2% contamination for all types of contamination) with and without contamination
 
 shift_values = c(4, 7, 10) # Shift values k = 4, 7 or 10
