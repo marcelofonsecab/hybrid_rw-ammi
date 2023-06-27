@@ -1,11 +1,19 @@
 ## Required Packages ##
-library(dplyr) # For the pipe function '%>%'
-library(pbapply) # To run the function in parallel processing
-library(lme4) # Linear mixed models (LMM)
-library(robustlmm) # Robust linear mixed models (RLMM)
-library(MASS) # Robust linear model (RLM)
-library(reshape2) # 'melt' function to reshape the data for the created functions
-library(rsvddpd) # Robust SVD
+
+# install.packages(dplyr)
+# install.packages(pbapply)
+# install.packages(lme4)
+# install.packages(robustlmm)
+# install.packages(MASS)
+# install.packages(reshape2)
+# install.packages(rsvddpd)
+require(dplyr) # For the pipe function '%>%'
+require(pbapply) # To run the function in parallel processing
+require(lme4) # Linear mixed models (LMM)
+require(robustlmm) # Robust linear mixed models (RLMM)
+require(MASS) # Robust linear model (RLM)
+require(reshape2) # 'melt' function to reshape the data for the created functions
+require(rsvddpd) # Robust SVD
 
 ## Functions ##
 

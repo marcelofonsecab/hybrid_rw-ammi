@@ -68,129 +68,131 @@ t(matrixofbests)
 
 # Biplots from the paper
 ## AMMI
+.envnames = colnames(allsvds$AMMI$estimated.data)
+
 BiplotCreation(allsvds$AMMI$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
 ## W-AMMI
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.Env$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$WAMMI$WAMMI_Weights.Rlm$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.RlmdotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
 ## R-AMMI
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.Env$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RAMMI$RAMMI_Weights.Rlm$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.RlmdotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
 ## RW-AMMI
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.Env$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RWAMMI$RWAMMI_Weights.Rlm$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.RlmdotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
 # Biplots from Supplementary material
 ## W-AMMI
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.Gen$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.GendotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.GenplusEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.RlmdotGen$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.RlmdotGendotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$WAMMI$WAMMI_lmm.Weights.GenplusEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
 ## R-AMMI
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.Gen$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.GendotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.GenplusEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.RlmdotGen$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.RlmdotGendotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RAMMI$RAMMI_rlmm.Weights.GenplusEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
 ## RW-AMMI
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.Gen$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.GendotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.GenplusEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.RlmdotGen$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.RlmdotGendotEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 BiplotCreation(allsvds$RWAMMI$RWAMMI_rlmm.Weights.GenplusEnv$SVD,
-               env.names = colnames(AMMI$estimated.data),
+               env.names = .envnames,
                lims = TRUE,
                lims.U = c(-2.6, 3.7), lims.V = c(-2.94, 3.2))
 
